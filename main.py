@@ -6,6 +6,13 @@ from dto import DiagnoseRequest, PlaygroundRequest, ChatRequest, GraphRequest
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace * with your frontend URL in production for security
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],  # Add OPTIONS to allowed methods
+    allow_headers=["*"],
+)
 
 
 # routes not protected
