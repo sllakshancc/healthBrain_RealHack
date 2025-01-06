@@ -20,3 +20,8 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {"message": "hello"}
+
+@app.post("/index/diagnose/{id}")
+async def diagnose(id: str, diagnose: DiagnoseRequest):
+    index_diagnose_db(id, diagnose)
+    return { "message" : "success"}
