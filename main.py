@@ -25,3 +25,8 @@ async def root():
 async def diagnose(id: str, diagnose: DiagnoseRequest):
     index_diagnose_db(id, diagnose)
     return { "message" : "success"}
+
+@app.post("/chat/{id}")
+async def diagnose(id: str, req: ChatRequest):
+    res =  chat(id, req.message)
+    return { "reply" : res}
