@@ -66,3 +66,41 @@ def index_diagnose_db(patient_id: str, diagnose: DiagnoseRequest):
 
     faiss_dbs[patient_id] = FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
     print(f"loaded to memory. id: {patient_id}")
+
+diagnose_chain_template = """You are an inteligent AI assistent to assist medical officer. you can make helpfull answer based on patient's diagnostic record.
+
+<DIAGNOSTIC RECORDS ON PATIENT>:
+{diagnoses}
+</DIAGNOSTIC RECORDS ON PATIENT>
+
+QUESTION:
+{user_question}
+AI Assistant:"""
+
+diagnose_chain_prompt = PromptTemplate(
+    input_variables=["user_question", "diagnoses"],
+    template=diagnose_chain_template
+)
+
+
+
+diagnose_chain = LLMChain(
+    llm=llm,
+    prompt=diagnose_chain_prompt,
+    verbose=True
+)
+
+def format_docs(docs):
+    return "\n\n".join(doc[0].page_content for doc in docs)
+
+def chat(patient_id, message):
+    if(patient_id not in faiss_dbs):
+        path = f"./local_data/{patient_id}/faiss_index"
+        if os.path.exists(path):
+            faiss_dbs[patient_id] = FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
+        else:
+            return f"no any diagnose data available for {patient_id}"
+    diagnoses = faiss_dbs[patient_id].similarity_search_with_score(message, k=3)
+    diagnoses = format_docs(diagnoses)
+    res = diagnose_chain.invoke({"user_question": message, "diagnoses": diagnoses})['text']
+    return res
