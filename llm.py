@@ -104,3 +104,26 @@ def chat(patient_id, message):
     diagnoses = format_docs(diagnoses)
     res = diagnose_chain.invoke({"user_question": message, "diagnoses": diagnoses})['text']
     return res
+
+
+############### Graph Genarating ###############
+
+from langchain.output_parsers import PydanticOutputParser
+from langchain_core.pydantic_v1 import BaseModel, Field, validator
+
+
+class Graph(BaseModel):
+    graph_name: str = Field(description="The name of the graph")
+    x_axis_name: str = Field(description="The X axis name of the graph")
+    y_axis_name: str = Field(description="The Y axis name of the graph")
+    x_cordinates: list[int] = Field(description="list of exractly 10 cordinates of x axis")
+    y_cordinates: list[int] = Field(description="list of exractly 10 cordinates of x axis")
+
+parser = PydanticOutputParser(pydantic_object=Graph)
+
+
+prompt = PromptTemplate(
+    template="Genarate graph patameter from given patient records. \nUSER QUEARY:\n{query}\n\n\n{format_instructions}\n",
+    input_variables=["query"],
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
