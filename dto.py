@@ -13,3 +13,6 @@ class PlaygroundRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
+
+class GraphRequest(BaseModel):
+    message: str
