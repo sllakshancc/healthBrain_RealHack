@@ -30,3 +30,7 @@ async def diagnose(id: str, diagnose: DiagnoseRequest):
 async def diagnose(id: str, req: ChatRequest):
     res =  chat(id, req.message)
     return { "reply" : res}
+
+@app.post("/graph")
+async def diagnose(req: GraphRequest):
+    return fill_schema(req.message)
