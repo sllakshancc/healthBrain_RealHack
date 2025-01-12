@@ -127,3 +127,16 @@ prompt = PromptTemplate(
     input_variables=["query"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
+
+graph_fill_chain = LLMChain(
+    llm=llm,
+    prompt=prompt,
+    verbose=True,
+    output_parser=parser
+)
+
+
+test_reports_dbs = {}
+
+def fill_schema(message: str):
+    return graph_fill_chain.invoke({"query": message})['text']
